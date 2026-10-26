@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>날씨 달력 미션 뽑기 · 기상 작전 편지</title>
+<style>
+:root{--navy:#17324d;--blue:#2869a6;--sky:#eaf5ff;--cream:#fffaf0;--ink:#202b36;--muted:#617181;--line:#d9e2ea;--orange:#f3a43b;--green:#28765b}
+*{box-sizing:border-box} body{margin:0;background:#f4f7fa;color:var(--ink);font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;line-height:1.55}
+header{background:linear-gradient(135deg,#17324d,#2869a6);color:#fff;padding:28px 18px 24px;text-align:center}
+header .eyebrow{font-size:.9rem;letter-spacing:.08em;opacity:.85} h1{margin:6px 0;font-size:clamp(1.6rem,4vw,2.4rem)} header p{margin:6px auto 0;max-width:760px;opacity:.93}
+main{max-width:1120px;margin:20px auto;padding:0 14px 40px;display:grid;gap:16px}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 5px 18px #1b36500a}
+h2{margin:0 0 12px;font-size:1.25rem;color:var(--navy)} h3{margin:0 0 8px}
+.small{color:var(--muted);font-size:.92rem}.toolbar{display:flex;flex-wrap:wrap;gap:9px}
+button{border:0;border-radius:12px;padding:11px 15px;font-size:1rem;font-weight:750;cursor:pointer;background:var(--blue);color:white}
+button.secondary{background:#eaf0f5;color:var(--navy)}button.orange{background:var(--orange);color:#39290f}button.green{background:var(--green)}
+button:focus,input:focus,textarea:focus,select:focus{outline:3px solid #9ecfff;outline-offset:2px}
+.draw-layout{display:grid;grid-template-columns:1fr 1.1fr;gap:16px;align-items:stretch}
+.draw-box{border-radius:15px;background:var(--sky);padding:16px}
+.dice{font-size:2.5rem;font-weight:900;color:var(--blue);margin:4px 0}.result{background:#fff;border:2px dashed #9bbbd8;border-radius:14px;padding:14px;min-height:125px}
+.result .num{font-size:.8rem;color:var(--blue);font-weight:800}.result h3{font-size:1.2rem;color:var(--navy)}
+.tag{display:inline-block;background:#e8f4ed;color:#1e684d;border-radius:99px;padding:3px 9px;font-size:.82rem;font-weight:750;margin:2px 4px 2px 0}
+.mission-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mission-card{border:1px solid var(--line);border-radius:13px;padding:12px;background:#fff;cursor:pointer;text-align:left;color:var(--ink);font-weight:500}
+.mission-card:hover{border-color:var(--blue);background:#f7fbff}.mission-card strong{display:block;color:var(--navy);margin-bottom:3px}.mission-card.active{border:2px solid var(--blue);background:#eff7ff}
+label{display:block;font-weight:750;margin:12px 0 5px;color:#30465a}
+input,textarea,select{width:100%;border:1px solid #c8d4df;border-radius:10px;padding:10px 11px;font:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:88px;resize:vertical}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.letter{background:var(--cream);border:1px solid #eadfca;border-radius:14px;padding:16px;margin-top:14px}
+.letter h3{text-align:center;letter-spacing:.06em}.letter p{margin:7px 0}
+.weather-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:720px;font-size:.92rem}th,td{border:1px solid var(--line);padding:7px 8px;text-align:center;white-space:nowrap}th{background:#edf4fa;color:var(--navy)}tbody tr:nth-child(even){background:#fafcfe}
+.note{background:#fff8e8;border-left:4px solid var(--orange);padding:10px 12px;border-radius:8px;margin-top:10px}
+.footer{text-align:center;color:var(--muted);font-size:.85rem}
+@media(max-width:760px){.draw-layout,.form-grid{grid-template-columns:1fr}.mission-grid{grid-template-columns:1fr}main{margin-top:12px}.panel{padding:14px}}
+@media print{body{background:#fff}.no-print,header,.weather-panel,.all-missions{display:none!important}main{display:block;max-width:none;margin:0;padding:0}.panel{box-shadow:none;border:0;padding:0}.letter{margin-top:12px;break-inside:avoid}button{display:none!important}input,textarea{border:0;border-bottom:1px solid #aaa;border-radius:0;background:transparent;padding:4px 0}textarea{min-height:65px}.letter{border:1px solid #aaa;background:#fff}}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">5학년 과학 · 날씨와 우리 생활</div>
+  <h1>🌦️ 날씨 탐정단의 기상 작전</h1>
+  <p>미션을 뽑고, 날씨 달력을 분석하고, 선택한 날짜와 까닭을 편지로 전해 보세요!</p>
+</header>
+<main>
+  <section class="panel no-print">
+    <h2>🎲 1. 오늘의 생활 미션 뽑기</h2>
+    <div class="draw-layout">
+      <div class="draw-box">
+        <p style="margin-top:0"><strong>방법 A. 주사위로 뽑기</strong></p>
+        <p class="small">가상의 10면 주사위를 굴려 미션 번호를 정해요.</p>
+        <div class="dice" id="diceFace">🎲 ?</div>
+        <button class="orange" onclick="rollDice()">주사위 굴리기</button>
+        <hr style="border:0;border-top:1px solid #c9ddeb;margin:18px 0">
+        <p><strong>방법 B. 제비뽑기</strong></p>
+        <p class="small">아직 뽑히지 않은 미션 중 하나가 무작위로 나와요.</p>
+        <button onclick="drawMission()">미션 제비 뽑기</button>
+        <button class="secondary" onclick="resetDraw()">뽑기 초기화</button>
+      </div>
+      <div class="result" id="drawResult" aria-live="polite">
+        <div class="num">미션 대기 중</div><h3>어떤 작전이 기다리고 있을까요?</h3>
+        <p class="small">주사위나 제비뽑기 버튼을 눌러 미션을 골라 보세요. 아래 목록에서 직접 선택해도 됩니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel no-print all-missions">
+    <h2>🗂️ 2. 미션 목록 (10개)</h2>
+    <p class="small">미션을 눌러 직접 선택할 수도 있어요.</p>
+    <div class="mission-grid" id="missionGrid"></div>
+  </section>
+
+  <section class="panel" id="worksheet">
+    <h2>✉️ 3. 기상 작전 편지 쓰기</h2>
+    <div id="missionPrompt" class="note">먼저 미션을 뽑거나 목록에서 선택해 주세요. 선택한 미션의 상황과 해결 과제가 여기에 나타납니다.</div>
+    <div class="form-grid">
+      <div><label for="writer">작전 수행자 이름</label><input id="writer" placeholder="예: 김○○ / ○○ 가족"></div>
+      <div><label for="recipient">편지를 받는 사람</label><input id="recipient" placeholder="예: 뽀로로 씨께"></div>
+    </div>
+    <label for="chosenDates">📅 내가 선택한 날짜</label>
+    <input id="chosenDates" placeholder="예: 3일~5일 / 10일과 11일">
+    <label for="element1">🔎 근거로 삼은 날씨 요소 1</label>
+    <select id="element1"><option value="">날씨 요소를 선택하세요</option><option>기온</option><option>풍속</option><option>습도</option><option>구름의 양</option><option>강수량</option></select>
+    <label for="evidence1">선택한 날의 수치와 그 의미</label>
+    <input id="evidence1" placeholder="예: 10일 기온은 35℃로 매우 높습니다.">
+    <label for="element2">🔎 근거로 삼은 날씨 요소 2</label>
+    <select id="element2"><option value="">날씨 요소를 선택하세요</option><option>기온</option><option>풍속</option><option>습도</option><option>구름의 양</option><option>강수량</option></select>
+    <label for="evidence2">선택한 날의 수치와 그 의미</label>
+    <input id="evidence2" placeholder="예: 습도는 30%이고 강수량은 0mm입니다.">
+    <label for="letterBody">💌 편지 내용</label>
+    <textarea id="letterBody" placeholder="안녕하세요. 저는 ○○ 미션을 해결하기 위해 ○일을 추천합니다. 그 까닭은 날씨 달력에서 ..."></textarea>
+    <div class="toolbar no-print" style="margin-top:13px">
+      <button class="green" onclick="updateLetter()">편지 미리 보기</button>
+      <button class="secondary" onclick="window.print()">미션지 인쇄하기</button>
+      <button class="secondary" onclick="downloadLetter()">편지 파일로 저장</button>
+      <button class="secondary" onclick="clearLetter()">작성 내용 지우기</button>
+    </div>
+    <div class="letter" id="letterPreview">
+      <h3>기상 작전 편지</h3>
+      <p id="previewRecipient">받는 사람: __________________</p>
+      <p>안녕하세요!</p>
+      <p id="previewMission">저는 아직 미션을 선택하지 않았습니다.</p>
+      <p id="previewDates">제가 선택한 날짜: __________________</p>
+      <p id="previewEvidence">날씨 달력에서 찾은 근거를 적어 주세요.</p>
+      <p id="previewBody">편지 내용을 작성한 뒤 ‘편지 미리 보기’를 누르면 여기에 나타납니다.</p>
+      <p style="text-align:right;margin-top:22px" id="previewWriter">보내는 사람: __________________</p>
+    </div>
+  </section>
+
+  <section class="panel weather-panel no-print">
+    <h2>🌤️ 참고 자료: 4주치 날씨 달력</h2>
+    <p class="small">수업에서 제공한 날씨 달력 자료를 웹페이지에 옮겼어요. 미션 해결 시 날씨 요소를 두 가지 이상 근거로 활용하세요.</p>
+    <div class="weather-wrap"><table id="weatherTable">
+      <thead><tr><th>날짜</th><th>기온</th><th>풍속</th><th>습도</th><th>구름의 양</th><th>강수량</th></tr></thead><tbody></tbody>
+    </table></div>
+    <p class="small">※ 이 달력은 수업용 탐구 자료이며 실제 예보가 아닙니다.</p>
+  </section>
+  <p class="footer">날씨 탐정단 · 날씨 자료를 근거로 생각하고 설명해요.</p>
+</main>
+<script>
+const missions = [
+ {title:"농부 뽀로로의 과수원 지키기", short:"과수원 지키기", prompt:"사과가 강한 햇볕에 말라버리거나 갑작스러운 비바람에 떨어질까 걱정입니다. 시설물을 고정하고 물 공급을 늘리는 등 가장 긴장하며 대비해야 할 3일 이상의 연속된 기간을 고르세요.", dates:"3일 이상 연속된 기간", recipient:"뽀로로 씨께"},
+ {title:"루피네 가족의 3박 4일 등산 여행", short:"3박 4일 등산", prompt:"산 정상에서 선명하게 경치를 구경하고 싶고, 우산이나 비옷은 챙기지 않을 계획입니다. 여행 기간 내내 비가 오지 않고 시야가 가려지지 않을 최적의 연속된 4일을 찾으세요.", dates:"연속된 4일", recipient:"루피네 가족께"},
+ {title:"패티네 마을의 야외 음식 축제", short:"야외 음식 축제", prompt:"음식이 쉽게 상하거나 방문객들이 땀이 잘 마르지 않아 불쾌해지는 상황을 피하고 싶습니다. 가장 주의하거나 실내로 옮겨야 할 날짜 2개를 고르세요. 단, 강수가 예정된 날짜는 제외하세요.", dates:"날짜 2개", recipient:"패티 씨께"},
+ {title:"포비의 바닷가 타워크레인 작업", short:"타워크레인 안전", prompt:"바닷가 근처 공사장에서 높은 크레인을 운전합니다. 기계가 흔들리면 큰 사고가 날 수 있으므로 작업을 중단하거나 장비를 묶어 두어야 할 위험한 날들을 모두 찾으세요.", dates:"위험한 날짜 모두", recipient:"포비 씨께"},
+ {title:"에디의 바싹바싹 과학 실험", short:"실험 재료 말리기", prompt:"젖은 실험 재료를 야외에서 가장 짧은 시간 안에 말려야 합니다. 가장 안전하고 빠르게 재료를 말릴 수 있는 하루를 선택하세요.", dates:"하루", recipient:"에디 씨께"},
+ {title:"햇볕 쨍쨍, 야외 작업자 안전 작전", short:"폭염 대비 작전", prompt:"야외에서 일하는 사람들이 더위로 지치지 않도록 특별히 대비할 3일 연속 기간을 정하세요. 높은 기온과 습도 등 날씨 요소를 살펴 작업 시간 조정과 물·그늘 준비가 필요한 까닭을 설명하세요.", dates:"연속된 3일", recipient:"야외 작업자 안전 담당자께"},
+ {title:"빨래가 가장 잘 마르는 날 찾기", short:"빨래 건조 작전", prompt:"가족의 빨래를 야외에서 하루 만에 바싹 말리고 싶습니다. 비가 오지 않고, 습도가 낮으며, 햇볕과 바람을 고려했을 때 가장 적합한 하루를 고르세요.", dates:"하루", recipient:"우리 가족께"},
+ {title:"가족 야외 소풍 날짜 정하기", short:"가족 소풍 작전", prompt:"가족이 공원에서 소풍을 하려고 합니다. 비가 오지 않고 바람이 너무 강하지 않으며, 기온과 구름의 양도 고려해 즐겁게 머물기 좋은 하루를 선택하세요.", dates:"하루", recipient:"소풍을 함께 갈 가족께"},
+ {title:"연날리기 축제 안전 점검", short:"연날리기 안전", prompt:"넓은 공원에서 연날리기 축제를 열 예정입니다. 바람이 너무 강하면 위험할 수 있습니다. 풍속을 중심으로 축제를 취소하거나 연날리기를 피해야 할 날짜를 모두 찾아 다른 날을 제안하세요.", dates:"강풍이 부는 날짜 모두", recipient:"연날리기 축제 담당자께"},
+ {title:"별빛 관측 동아리의 밤", short:"별 관측 작전", prompt:"별빛 관측 동아리가 밤하늘을 관찰하려고 합니다. 구름이 적고 비가 오지 않는 날을 중심으로 관측하기 좋은 날짜 2개를 고르세요. 구름의 양과 강수량을 포함해 설명하세요.", dates:"날짜 2개", recipient:"별빛 관측 동아리께"}
+];
+const weather = [
+[1,24,2,55,4,0],[2,23,2,40,1,0],[3,24,3,35,0,0],[4,25,2,30,2,0],[5,24,3,40,1,0],[6,23,4,70,8,8],[7,25,2,60,5,0],
+[8,30,2,38,1,0],[9,33,3,32,0,0],[10,35,3,30,0,0],[11,34,2,35,1,0],[12,27,3,65,6,0],[13,29,2,75,7,0],[14,32,1,90,7,0],
+[15,32,1,95,8,0],[16,27,3,75,8,12],[17,26,5,80,9,20],[18,25,8,90,10,50],[19,24,14,95,10,100],[20,24,16,95,10,150],[21,25,5,85,9,15],
+[22,26,3,70,5,0],[23,24,2,85,7,0],[24,25,2,90,8,0],[25,24,1,95,10,0],[26,25,2,90,9,0],[27,27,3,50,3,0],[28,28,12,30,1,0]
+];
+let current = null;
+let drawn = new Set();
+const $ = id => document.getElementById(id);
+function renderMissions(){
+ $('missionGrid').innerHTML = missions.map((m,i)=>`<button class="mission-card" id="mc${i}" onclick="selectMission(${i},'manual')"><strong>미션 ${i+1}. ${m.short}</strong><span class="small">${m.dates} · 눌러서 선택</span></button>`).join('');
+}
+function selectMission(i,source='manual'){
+ current=i;
+ document.querySelectorAll('.mission-card').forEach((el,j)=>el.classList.toggle('active',j===i));
+ const m=missions[i];
+ $('missionPrompt').innerHTML=`<span class="tag">미션 ${i+1}</span><strong>${m.title}</strong><p>${m.prompt}</p><p><strong>해결 조건:</strong> ${m.dates}를 선택하고 날씨 요소 2가지 이상을 근거로 편지를 작성하세요.</p>`;
+ if(!$('recipient').value || source!=='manual') $('recipient').value=m.recipient;
+ $('drawResult').innerHTML=`<div class="num">MISSION ${String(i+1).padStart(2,'0')} · ${source==='dice'?'주사위 결과':source==='draw'?'제비뽑기 결과':'직접 선택'}</div><h3>${m.title}</h3><p>${m.prompt}</p><span class="tag">${m.dates}</span>`;
+ $('previewMission').textContent=`저는 「${m.title}」 미션을 해결하기 위해 다음과 같이 추천합니다.`;
+ updateLetter();
+}
+function rollDice(){
+ const i=Math.floor(Math.random()*missions.length);
+ $('diceFace').textContent='🎲 '+(i+1);
+ selectMission(i,'dice');
+ drawn.add(i);
+}
+function drawMission(){
+ const remaining=missions.map((_,i)=>i).filter(i=>!drawn.has(i));
+ if(!remaining.length){$('drawResult').innerHTML='<h3>모든 미션을 뽑았어요!</h3><p>초기화 버튼을 누르면 다시 뽑을 수 있어요.</p>';return;}
+ const i=remaining[Math.floor(Math.random()*remaining.length)];
+ drawn.add(i); $('diceFace').textContent='🎟️ '+(i+1); selectMission(i,'draw');
+}
+function resetDraw(){drawn.clear();$('diceFace').textContent='🎲 ?';$('drawResult').innerHTML='<div class="num">미션 대기 중</div><h3>어떤 작전이 기다리고 있을까요?</h3><p class="small">주사위나 제비뽑기 버튼을 눌러 미션을 골라 보세요.</p>';}
+function renderWeather(){
+ $('weatherTable').querySelector('tbody').innerHTML=weather.map(r=>`<tr><td>${r[0]}일</td><td>${r[1]}℃</td><td>${r[2]}m/s</td><td>${r[3]}%</td><td>${r[4]}/10</td><td>${r[5]}mm</td></tr>`).join('');
+}
+function updateLetter(){
+ const m=current===null?null:missions[current];
+ $('previewRecipient').textContent='받는 사람: '+($('recipient').value||'__________________');
+ $('previewMission').textContent=m?`저는 「${m.title}」 미션을 해결하기 위해 다음과 같이 추천합니다.`:'저는 아직 미션을 선택하지 않았습니다.';
+ $('previewDates').textContent='제가 선택한 날짜: '+($('chosenDates').value||'__________________');
+ const e1=$('element1').value, e2=$('element2').value;
+ const ev1=$('evidence1').value, ev2=$('evidence2').value;
+ let ev='날씨 달력에서 찾은 근거: ';
+ ev += e1 ? `${e1} — ${ev1||'수치와 의미를 적어 주세요.'}` : '첫 번째 날씨 요소를 선택해 주세요.';
+ ev += ' / ';
+ ev += e2 ? `${e2} — ${ev2||'수치와 의미를 적어 주세요.'}` : '두 번째 날씨 요소를 선택해 주세요.';
+ $('previewEvidence').textContent=ev;
+ $('previewBody').textContent=$('letterBody').value||'편지 내용을 작성한 뒤 ‘편지 미리 보기’를 누르면 여기에 나타납니다.';
+ $('previewWriter').textContent='보내는 사람: '+($('writer').value||'__________________');
+}
+function clearLetter(){
+ ['writer','recipient','chosenDates','evidence1','evidence2','letterBody'].forEach(id=>$(id).value='');
+ $('element1').value='';$('element2').value='';updateLetter();
+}
+function downloadLetter(){
+ updateLetter();
+ const content=[ $('previewRecipient').textContent,'안녕하세요!',$('previewMission').textContent,$('previewDates').textContent,$('previewEvidence').textContent,$('previewBody').textContent,'',$('previewWriter').textContent].join('\n\n');
+ const blob=new Blob(['\ufeff'+content],{type:'text/plain;charset=utf-8'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='기상_작전_편지.txt';a.click();URL.revokeObjectURL(a.href);
+}
+['writer','recipient','chosenDates','element1','element2','evidence1','evidence2','letterBody'].forEach(id=>$(id).addEventListener('input',updateLetter));
+renderMissions();renderWeather();
+</script>
+</body>
+</html>
