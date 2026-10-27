@@ -9,7 +9,15 @@
 *{box-sizing:border-box} body{margin:0;background:#f4f7fa;color:var(--ink);font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;line-height:1.55}
 header{background:linear-gradient(135deg,#17324d,#2869a6);color:#fff;padding:28px 18px 24px;text-align:center}
 header .eyebrow{font-size:.9rem;letter-spacing:.08em;opacity:.85} h1{margin:6px 0;font-size:clamp(1.6rem,4vw,2.4rem)} header p{margin:6px auto 0;max-width:760px;opacity:.93}
-main{max-width:1120px;margin:20px auto;padding:0 14px 40px;display:grid;gap:16px}
+main{max-width:1500px;margin:20px auto;padding:0 14px 40px;display:block}
+#workspace{display:grid;grid-template-columns:minmax(300px,.82fr) minmax(0,1.35fr);gap:16px;align-items:start}
+#leftColumn,#rightColumn{display:grid;gap:16px;min-width:0}
+#letterPreviewPanel{margin-top:16px}
+.weather-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:10px}
+.weather-day{border:1px solid #d9e2ea;border-radius:9px;padding:7px 4px;background:#fbfdff;min-width:0;text-align:left;font-size:.78rem;line-height:1.45}
+.weather-day .date{font-size:.95rem;font-weight:800;color:#17324d;border-bottom:1px solid #e4ebf1;padding-bottom:3px;margin-bottom:4px}
+.weather-day .weather-line{display:block;white-space:normal;overflow-wrap:anywhere;color:#41566a}
+.weekday{background:#edf4fa;color:#17324d;text-align:center;font-weight:800;padding:5px 2px;border-radius:7px;font-size:.8rem}
 .panel{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 5px 18px #1b36500a}
 h2{margin:0 0 12px;font-size:1.25rem;color:var(--navy)} h3{margin:0 0 8px}
 .small{color:var(--muted);font-size:.92rem}.toolbar{display:flex;flex-wrap:wrap;gap:9px}
@@ -29,7 +37,8 @@ textarea{min-height:88px;resize:vertical}
 .weather-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:720px;font-size:.92rem}th,td{border:1px solid var(--line);padding:7px 8px;text-align:center;white-space:nowrap}th{background:#edf4fa;color:var(--navy)}tbody tr:nth-child(even){background:#fafcfe}
 .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:8px}.day-btn{padding:9px 2px;background:#f0f6fb;color:#24445f;border:1px solid #d8e5ef;font-size:.95rem}.day-btn.selected{background:#2869a6;color:#fff;border:2px solid #17324d}.day-btn:disabled{opacity:.35}.drawing-wrap{border:1px solid #d9e2ea;border-radius:14px;padding:10px;background:#fff}.drawing-canvas{display:block;width:100%;height:180px;border:2px dashed #d9c8e6;border-radius:10px;touch-action:none;background:#fffdfb}.draw-colors{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.color-btn{width:32px;height:32px;padding:0;border:3px solid white;box-shadow:0 0 0 1px #ccd5df;border-radius:50%}.color-btn.active{box-shadow:0 0 0 3px #2869a6}.note{background:#fff8e8;border-left:4px solid var(--orange);padding:10px 12px;border-radius:8px;margin-top:10px}
 .footer{text-align:center;color:var(--muted);font-size:.85rem}
-@media(max-width:760px){.form-grid{grid-template-columns:1fr}.mission-grid{grid-template-columns:1fr}main{margin-top:12px}.panel{padding:14px}}
+@media(max-width:900px){#workspace{grid-template-columns:1fr}#letterPreviewPanel{margin-top:16px}}
+@media(max-width:560px){.form-grid{grid-template-columns:1fr}.mission-grid{grid-template-columns:1fr}main{margin-top:12px}.panel{padding:14px}.weather-calendar{gap:3px}.weather-day{padding:4px 2px;font-size:.68rem}.weather-day .date{font-size:.8rem}.weekday{font-size:.7rem}}
 @media print{body{background:#fff}.no-print,header,.weather-panel,.all-missions{display:none!important}main{display:block;max-width:none;margin:0;padding:0}.panel{box-shadow:none;border:0;padding:0}.letter{margin-top:12px;break-inside:avoid}button{display:none!important}input,textarea{border:0;border-bottom:1px solid #aaa;border-radius:0;background:transparent;padding:4px 0}textarea{min-height:65px}.letter{border:1px solid #aaa;background:#fff}}
 </style>
 </head>
@@ -40,22 +49,22 @@ textarea{min-height:88px;resize:vertical}
   <p>날씨 달력을 분석하고 미션을 해결해 보세요!</p>
 </header>
 <main>
-  <section class="panel weather-panel no-print">
-    <h2>🌤️ 참고 자료: 4주치 날씨 달력</h2>
-    <p class="small">수업에서 제공한 날씨 달력 자료를 웹페이지에 옮겼어요. 미션 해결 시 날씨 요소를 두 가지 이상 근거로 활용하세요.</p>
-    <div class="weather-wrap"><table id="weatherTable">
-      <thead><tr><th>날짜</th><th>기온</th><th>풍속</th><th>습도</th><th>구름의 양</th><th>강수량</th></tr></thead><tbody></tbody>
-    </table></div>
-    <p class="small">※ 이 달력은 수업용 탐구 자료이며 실제 예보가 아닙니다.</p>
-  </section>
-
-  <section class="panel no-print all-missions">
-    <h2>🗂️ 1. 생활 미션 목록 (10개)</h2>
-    <p class="small">미션을 눌러 직접 선택할 수도 있어요.</p>
-    <div class="mission-grid" id="missionGrid"></div>
-  </section>
-
-  <section class="panel" id="worksheet">
+  <div id="workspace">
+    <div id="leftColumn">
+      <section class="panel weather-panel no-print">
+        <h2>🌤️ 참고 자료: 4주치 날씨 달력</h2>
+        <p class="small">달력에서 날짜별 기온·풍속·습도·구름의 양·강수량을 확인하세요.</p>
+        <div id="weatherCalendar" class="weather-calendar" aria-label="4주치 날씨 달력"></div>
+        <p class="small">※ 수업용 탐구 자료이며 실제 예보가 아닙니다.</p>
+      </section>
+    </div>
+    <div id="rightColumn">
+      <section class="panel no-print all-missions">
+        <h2>🗂️ 1. 생활 미션 목록 (10개)</h2>
+        <p class="small">미션을 눌러 직접 선택하세요.</p>
+        <div class="mission-grid" id="missionGrid"></div>
+      </section>
+      <section class="panel" id="worksheet">
     <h2>✉️ 2. 기상 작전 편지 쓰기</h2>
     <div id="missionPrompt" class="note">위 미션 목록에서 해결할 미션을 직접 선택해 주세요. 선택한 미션의 상황과 해결 과제가 여기에 나타납니다.</div>
     <div class="form-grid">
@@ -100,19 +109,23 @@ textarea{min-height:88px;resize:vertical}
       <button class="secondary" onclick="copyMission()">📋 미션 내용 복사</button>
       <button class="secondary" onclick="clearLetter()">작성 내용 지우기</button>
     </div>
+  </section>
+    </div>
+  </div>
+  <section class="panel" id="letterPreviewPanel">
+    <h2>💌 3. 기상 작전 편지 미리 보기</h2>
     <div class="letter" id="letterPreview">
       <h3>기상 작전 편지</h3>
       <p id="previewRecipient">받는 사람: __________________</p>
       <p>안녕하세요!</p>
-      <p id="previewMission">저는 아직 미션을 선택하지 않았습니다.</p>
-      <p id="previewDates">제가 선택한 날짜: __________________</p>
-      <p id="previewEvidence">날씨 달력에서 찾은 근거를 적어 주세요.</p>
+      <p id="previewMission">「000 미션을 해결하기 위해 해결 편지를 보내요!</p>
+      <p id="previewDates">이 날짜를 추천해요!: 000일</p>
+      <p id="previewEvidence">날씨 달력에서 찾은 근거는 다음과 같아요!</p>
       <p id="previewBody">편지 내용을 작성한 뒤 ‘편지 미리 보기’를 누르면 여기에 나타납니다.</p>
       <div id="previewDrawingWrap" style="display:none;text-align:center;margin:14px 0"><img id="previewDrawing" alt="편지에 그린 그림" style="max-width:100%;max-height:180px;object-fit:contain"></div>
       <p style="text-align:right;margin-top:22px" id="previewWriter">보내는 사람: __________________</p>
     </div>
   </section>
-
 
   <p class="footer">청안초 5학년 날씨 탐정단 · 날씨 자료를 근거로 생각하고 설명해요.</p>
 </main>
@@ -148,7 +161,7 @@ function selectMission(i){
  const m=missions[i];
  $('missionPrompt').innerHTML=`<span class="tag">미션 ${i+1}</span><strong>${m.title}</strong><p>${m.prompt}</p><p><strong>해결 조건:</strong> ${m.dates}를 선택하고 날씨 요소 2가지 이상을 근거로 편지를 작성하세요.</p>`;
  $('recipient').value=m.recipient;
- $('previewMission').textContent=`저는 「${m.title}」 미션을 해결하기 위해 다음과 같이 추천합니다.`;
+ $('previewMission').textContent=`「${m.title}」 미션을 해결하기 위해 해결 편지를 보내요!`;
  updateLetter();
 }
 function renderDatePicker(){
@@ -158,17 +171,18 @@ function renderDatePicker(){
 }
 function toggleDay(day){if(selectedDays.has(day))selectedDays.delete(day);else selectedDays.add(day);renderDatePicker();updateLetter();}
 function renderWeather(){
- $('weatherTable').querySelector('tbody').innerHTML=weather.map(r=>`<tr><td>${r[0]}일</td><td>${r[1]}℃</td><td>${r[2]}m/s</td><td>${r[3]}%</td><td>${r[4]}/10</td><td>${r[5]}mm</td></tr>`).join('');
+ const days=['일','월','화','수','목','금','토'];
+ $('weatherCalendar').innerHTML=days.map(d=>`<div class="weekday">${d}</div>`).join('')+weather.map(r=>`<div class="weather-day"><div class="date">${r[0]}일</div><span class="weather-line">🌡️ ${r[1]}℃</span><span class="weather-line">💨 ${r[2]}m/s</span><span class="weather-line">💧 ${r[3]}%</span><span class="weather-line">☁️ ${r[4]}/10</span><span class="weather-line">🌧️ ${r[5]}mm</span></div>`).join('');
 }
 function updateLetter(){
  const m=current===null?null:missions[current];
  $('previewRecipient').textContent='받는 사람: '+($('recipient').value||'__________________');
- $('previewMission').textContent=m?`저는 「${m.title}」 미션을 해결하기 위해 다음과 같이 추천합니다.`:'저는 아직 미션을 선택하지 않았습니다.';
- $('previewDates').textContent='제가 선택한 날짜: '+($('chosenDates').value||'__________________');
+ $('previewMission').textContent=m?`「${m.title}」 미션을 해결하기 위해 해결 편지를 보내요!`:'「000 미션을 해결하기 위해 해결 편지를 보내요!';
+ $('previewDates').textContent='이 날짜를 추천해요!: '+($('chosenDates').value||'000일');
  const drawing=$('drawingCanvas'); const drawingWrap=$('previewDrawingWrap'); if(drawing && drawingWrap){const hasDrawing= drawingHasMarks(); drawingWrap.style.display=hasDrawing?'block':'none'; if(hasDrawing) $('previewDrawing').src=drawing.toDataURL('image/png');}
  const e1=$('element1').value, e2=$('element2').value;
  const ev1=$('evidence1').value, ev2=$('evidence2').value;
- let ev='날씨 달력에서 찾은 근거: ';
+ let ev='날씨 달력에서 찾은 근거는 다음과 같아요!\n';
  ev += e1 ? `${e1} — ${ev1||'수치와 의미를 적어 주세요.'}` : '첫 번째 날씨 요소를 선택해 주세요.';
  ev += ' / ';
  ev += e2 ? `${e2} — ${ev2||'수치와 의미를 적어 주세요.'}` : '두 번째 날씨 요소를 선택해 주세요.';
@@ -198,9 +212,9 @@ function saveLetterImage(){
   {text:'💌 기상 작전 편지 💌',size:30,color:'#76518b',gap:50,bold:true},
   {text:'받는 사람: '+($('recipient').value||'__________________'),size:19,color:'#8a5b87',gap:36,bold:true},
   {text:'안녕하세요! 😊',size:20,color:'#35495e',gap:36,bold:false},
-  {text:m?`저는 「${m.title}」 미션을 해결하기 위해 다음과 같이 추천합니다.`:'저는 아직 미션을 선택하지 않았습니다.',size:19,color:'#35495e',gap:56,bold:false},
-  {text:'📅 제가 선택한 날짜: '+($('chosenDates').value||'__________________'),size:19,color:'#38678d',gap:38,bold:true},
-  {text:'🔎 날씨 달력에서 찾은 근거',size:19,color:'#76518b',gap:34,bold:true},
+  {text:m?`「${m.title}」 미션을 해결하기 위해 해결 편지를 보내요!`:'「000 미션을 해결하기 위해 해결 편지를 보내요!',size:19,color:'#35495e',gap:56,bold:true},
+  {text:'📅 이 날짜를 추천해요!: '+($('chosenDates').value||'000일'),size:19,color:'#38678d',gap:38,bold:true},
+  {text:'🔎 날씨 달력에서 찾은 근거는 다음과 같아요!',size:19,color:'#76518b',gap:34,bold:true},
   {text:($('element1').value?$('element1').value+' — ':'')+($('evidence1').value||'첫 번째 근거를 적어 주세요.'),size:17,color:'#35495e',gap:31,bold:false},
   {text:($('element2').value?$('element2').value+' — ':'')+($('evidence2').value||'두 번째 근거를 적어 주세요.'),size:17,color:'#35495e',gap:48,bold:false},
   {text:'💬 '+($('letterBody').value||'편지 내용을 여기에 작성해 주세요.'),size:19,color:'#35495e',gap:30,bold:false},
